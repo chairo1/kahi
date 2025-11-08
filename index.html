@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>KAHI — Tezliklə açılacaq</title>
+  <meta name="description" content="KAHI | Healthy Food Platform — Tezliklə açılacaq. Sağlam & dadlı qida üçün bizi izləyin.">
+  <meta name="theme-color" content="#0f172a" />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="KAHI — Tezliklə açılacaq"/>
+  <meta property="og:description" content="Sağlam & dadlı qida üçün bizi izləyin."/>
+  <meta property="og:type" content="website"/>
+  <meta property="og:url" content="https://kahi.az"/>
+  <!-- Şəkiliniz olduqda src-ı dəyişin -->
+  <meta property="og:image" content="https://dummyimage.com/1200x630/0f172a/ffffff&text=KAHI"/>
+
+  <style>
+    :root{
+      --bg:#0f172a;          /* tünd şifer */
+      --card:#111827;        /* bir az açıq fon */
+      --text:#e5e7eb;        /* açıq mətni */
+      --muted:#9ca3af;       /* solğun mətni */
+      --accent:#c6a15b;      /* qızılı akcent (istəyə görə dəyiş) */
+      --link:#e5e7eb;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1200px 800px at 80% -10%, rgba(198,161,91,0.15), transparent 60%),
+                  radial-gradient(900px 600px at -10% 110%, rgba(198,161,91,0.12), transparent 50%),
+                  var(--bg);
+      color:var(--text);
+      display:grid; place-items:center; padding:24px;
+    }
+    .wrap{width:min(980px,100%);}
+    .card{
+      background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.02));
+      border:1px solid rgba(255,255,255,0.08);
+      border-radius:24px; padding:40px; backdrop-filter: blur(6px);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    }
+    .brand{display:flex; align-items:center; gap:16px; margin-bottom:28px}
+    .logo{
+      width:56px; height:56px; border-radius:14px;
+      display:grid; place-items:center; font-weight:800; letter-spacing:1px;
+      background:linear-gradient(135deg, var(--accent), #e7d2a3);
+      color:#111; box-shadow: inset 0 0 0 2px rgba(0,0,0,0.1);
+    }
+    .title{font-size:28px; line-height:1.15; margin:0; font-weight:800; letter-spacing:0.5px}
+    .subtitle{color:var(--muted); margin:6px 0 0; font-size:14px}
+
+    .hero{margin:8px 0 28px}
+    .headline{font-size: clamp(32px, 6vw, 56px); line-height:1.05; margin:0 0 12px; font-weight:900;}
+    .kicker{color:var(--muted); font-size: clamp(14px, 2.2vw, 18px); max-width:720px}
+
+    .cta{display:flex; flex-wrap:wrap; gap:12px; margin:28px 0}
+    .btn{
+      appearance:none; border:none; cursor:pointer; text-decoration:none;
+      padding:14px 18px; border-radius:14px; font-weight:700; font-size:15px;
+      transition: transform .06s ease, box-shadow .2s ease, background .2s ease;
+      display:inline-flex; align-items:center; gap:10px
+    }
+    .btn-primary{background:var(--accent); color:#111}
+    .btn-primary:hover{transform: translateY(-1px); box-shadow:0 8px 20px rgba(198,161,91,.35)}
+    .btn-ghost{background:rgba(255,255,255,.06); color:var(--link); border:1px solid rgba(255,255,255,.1)}
+    .btn-ghost:hover{background:rgba(255,255,255,.09)}
+
+    .social{display:flex; gap:10px; margin-top:6px}
+    .social a{width:42px; height:42px; display:grid; place-items:center; border-radius:12px; border:1px solid rgba(255,255,255,.12); text-decoration:none; color:var(--link)}
+    .social a:hover{background:rgba(255,255,255,.08)}
+
+    .grid{display:grid; grid-template-columns:1fr; gap:18px; margin-top:22px}
+    .panel{
+      background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.08);
+      border-radius:18px; padding:18px
+    }
+    .panel h3{margin:0 0 8px; font-size:16px}
+    .panel p{margin:0; color:var(--muted); font-size:14px}
+
+    .footer{margin-top:28px; color:var(--muted); font-size:13px}
+    .footer a{color:var(--link)}
+
+    @media (min-width: 820px){
+      .grid{grid-template-columns:1.2fr .8fr}
+    }
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <section class="card">
+      <div class="brand">
+        <div class="logo" aria-label="KAHI">K</div>
+        <div>
+          <h1 class="title">KAHI — Healthy Food Platform</h1>
+          <p class="subtitle">Sağlam & dadlı qida üçün ağıllı ekosistem</p>
+        </div>
+      </div>
+
+      <header class="hero">
+        <h2 class="headline">Tezliklə açılacaq ✨</h2>
+        <p class="kicker">KAHI, tibbi göstəricilər və fərdi ehtiyaclar əsasında **ağıllı qidalanma planları** və **zero‑waste** mətbəxi ilə yeni nəsil “Culinary Medicine” təcrübəsi təqdim edir.</p>
+      </header>
+
+      <div class="cta">
+        <a class="btn btn-primary" href="mailto:office@kahi.az?subject=KAHI%20%E2%80%94%20Erk%C9%99n%20giri%C5%9F%20m%C9%99lumat%C4%B1&body=Salam%20KAHI%20komandasi%2C%20yenil%C9%99m%C9%99l%C9%99rd%C9%99n%20x%C9%99b%C9%99rdar%20olmaq%20%C3%BC%C3%A7%C3%BCn%20e%2Dpo%C3%A7tumu%20siyah%C4%B1n%C4%B1za%20%C9%99lav%C9%99%20edin.%20T%C9%99%C5%9F%C9%99kk%C3%BCr%C7%99l%C9%99r!">Email ilə xəbərdar olun</a>
+        <a class="btn btn-ghost" href="https://www.instagram.com/kahi.az/" target="_blank" rel="noopener">Instagram-da izləyin</a>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <h3>Missiyamız</h3>
+          <p>“Diaqnozdan süfrəyə” körpü: sağlamlığınızı ölçüləbilən göstəricilər əsasında dadlı yeməklərə çeviririk.</p>
+        </div>
+        <div class="panel">
+          <h3>Əlaqə</h3>
+          <p><a href="mailto:office@kahi.az">office@kahi.az</a> · <a href="https://www.instagram.com/kahi.az/" target="_blank" rel="noopener">@kahi.az</a></p>
+        </div>
+      </div>
+
+      <p class="footer">© <span id="y"></span> KAHI. Bütün hüquqlar qorunur.</p>
+    </section>
+  </main>
+
+  <script>
+    // Cari ili avtomatik yaz
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
