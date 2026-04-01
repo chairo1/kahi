@@ -1,0 +1,1771 @@
+---
+import '../styles/global.css';
+---
+<!DOCTYPE html>
+<html lang="az">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kahı — Sağlam Menu · Elmi əsaslarla</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── TOKENS ─────────────────────────────────────────── */
+    :root {
+      --green-deep:   #1c3a2a;
+      --green-mid:    #2e5c3e;
+      --green-light:  #4a8a5c;
+      --green-pale:   #d4e8d8;
+      --cream:        #f7f3ec;
+      --cream-warm:   #ede7db;
+      --terra:        #b86840;
+      --terra-light:  #e8c4a0;
+      --ivory:        #faf8f4;
+      --charcoal:     #1a1a16;
+      --text-body:    #3a3a32;
+      --text-muted:   #7a7a6a;
+
+      --ff-display: 'Cormorant Garamond', Georgia, serif;
+      --ff-body:    'Jost', sans-serif;
+
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+    }
+
+    /* ─── RESET ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; font-size: 16px; }
+    body {
+      font-family: var(--ff-body);
+      background: var(--ivory);
+      color: var(--text-body);
+      overflow-x: hidden;
+      cursor: none;
+    }
+    img { display: block; max-width: 100%; }
+    a { text-decoration: none; color: inherit; }
+    ul { list-style: none; }
+
+    /* ─── CUSTOM CURSOR ──────────────────────────────────── */
+    .cursor {
+      position: fixed;
+      width: 10px; height: 10px;
+      background: var(--green-mid);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      transition: transform 0.1s var(--ease-out), width 0.3s var(--ease-out), height 0.3s var(--ease-out), background 0.3s;
+      mix-blend-mode: multiply;
+    }
+    .cursor-ring {
+      position: fixed;
+      width: 38px; height: 38px;
+      border: 1.5px solid var(--green-mid);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transform: translate(-50%, -50%);
+      transition: transform 0.18s var(--ease-out), width 0.3s var(--ease-out), height 0.3s var(--ease-out), opacity 0.3s;
+      opacity: 0.6;
+    }
+    .cursor.hover { width: 16px; height: 16px; background: var(--terra); }
+    .cursor-ring.hover { width: 52px; height: 52px; opacity: 0.3; }
+
+    /* ─── NOISE OVERLAY ──────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 1000;
+      opacity: 0.35;
+    }
+
+    /* ─── REVEAL ANIMATION ───────────────────────────────── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(32px);
+      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-left {
+      opacity: 0; transform: translateX(-40px);
+      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+    }
+    .reveal-left.visible { opacity: 1; transform: none; }
+    .reveal-right {
+      opacity: 0; transform: translateX(40px);
+      transition: opacity 0.9s var(--ease-out), transform 0.9s var(--ease-out);
+    }
+    .reveal-right.visible { opacity: 1; transform: none; }
+
+    /* ─── NAVIGATION ─────────────────────────────────────── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0;
+      z-index: 900;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 22px 48px;
+      transition: background 0.4s, padding 0.4s, backdrop-filter 0.4s;
+    }
+    nav.scrolled {
+      background: rgba(247, 243, 236, 0.88);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      padding: 14px 48px;
+      border-bottom: 1px solid rgba(46, 92, 62, 0.12);
+    }
+    .nav-logo {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .nav-logo svg { width: 36px; height: 36px; }
+    .nav-logo-text {
+      font-family: var(--ff-display);
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: var(--green-deep);
+      letter-spacing: 0.04em;
+    }
+    .nav-links {
+      display: flex; gap: 36px; align-items: center;
+    }
+    .nav-links a {
+      font-family: var(--ff-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--green-deep);
+      position: relative;
+      padding-bottom: 3px;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0;
+      width: 0; height: 1px;
+      background: var(--terra);
+      transition: width 0.3s var(--ease-out);
+    }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: var(--green-deep) !important;
+      color: var(--cream) !important;
+      padding: 10px 22px !important;
+      border-radius: 100px;
+      font-size: 0.78rem !important;
+      transition: background 0.3s, transform 0.2s !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { background: var(--green-light) !important; transform: scale(1.03); }
+
+    /* ─── HERO ───────────────────────────────────────────── */
+    #hero {
+      min-height: 100vh;
+      background: var(--green-deep);
+      position: relative;
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 60% at 70% 50%, rgba(74, 138, 92, 0.2) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 70% at 20% 80%, rgba(184, 104, 64, 0.12) 0%, transparent 60%);
+    }
+    /* decorative botanical lines */
+    .hero-lines {
+      position: absolute; right: 0; top: 0; bottom: 0;
+      width: 48%;
+      opacity: 0.07;
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      display: flex; align-items: center;
+      flex: 1;
+      padding: 120px 48px 80px;
+      max-width: 1280px;
+      margin: 0 auto;
+      width: 100%;
+      gap: 60px;
+    }
+    .hero-left { flex: 1; }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(212, 232, 216, 0.12);
+      border: 1px solid rgba(212, 232, 216, 0.25);
+      padding: 7px 16px;
+      border-radius: 100px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--green-pale);
+      margin-bottom: 28px;
+      animation: fadeDown 1s var(--ease-out) 0.2s both;
+    }
+    .hero-badge-dot {
+      width: 6px; height: 6px;
+      background: var(--terra-light);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.7); }
+    }
+    .hero-title {
+      font-family: var(--ff-display);
+      font-size: clamp(3.2rem, 7vw, 6rem);
+      font-weight: 300;
+      line-height: 1.06;
+      color: var(--cream);
+      letter-spacing: -0.01em;
+      animation: fadeDown 1s var(--ease-out) 0.35s both;
+    }
+    .hero-title em {
+      font-style: italic;
+      color: var(--terra-light);
+    }
+    .hero-title .line2 { display: block; }
+    .hero-sub {
+      margin-top: 28px;
+      font-size: 1rem;
+      font-weight: 300;
+      color: rgba(212, 232, 216, 0.75);
+      line-height: 1.7;
+      max-width: 420px;
+      animation: fadeDown 1s var(--ease-out) 0.5s both;
+    }
+    .hero-actions {
+      display: flex; gap: 16px; align-items: center;
+      margin-top: 44px;
+      animation: fadeDown 1s var(--ease-out) 0.65s both;
+    }
+    .btn-primary {
+      background: var(--terra);
+      color: var(--ivory);
+      padding: 15px 34px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.3s, transform 0.2s, box-shadow 0.3s;
+    }
+    .btn-primary:hover {
+      background: #d47a50;
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(184, 104, 64, 0.35);
+    }
+    .btn-outline {
+      display: flex; align-items: center; gap: 10px;
+      color: var(--green-pale);
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.06em;
+      transition: gap 0.3s var(--ease-out), color 0.3s;
+    }
+    .btn-outline:hover { color: var(--cream); gap: 16px; }
+    .btn-outline-arrow {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(212, 232, 216, 0.3);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .btn-outline:hover .btn-outline-arrow {
+      border-color: var(--green-pale);
+      transform: rotate(45deg);
+    }
+
+    /* hero stats */
+    .hero-stats {
+      display: flex; gap: 40px;
+      margin-top: 68px;
+      padding-top: 40px;
+      border-top: 1px solid rgba(212, 232, 216, 0.12);
+      animation: fadeDown 1s var(--ease-out) 0.8s both;
+    }
+    .hero-stat-num {
+      font-family: var(--ff-display);
+      font-size: 2.2rem;
+      font-weight: 300;
+      color: var(--cream);
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.72rem;
+      font-weight: 400;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(212, 232, 216, 0.55);
+      margin-top: 5px;
+    }
+
+    /* hero right: floating visual */
+    .hero-right {
+      flex: 0 0 400px;
+      position: relative;
+      height: 520px;
+      animation: float 6s var(--ease-in-out) infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-16px); }
+    }
+    .hero-plate {
+      position: absolute; inset: 0;
+      background: rgba(46, 92, 62, 0.18);
+      border: 1px solid rgba(212, 232, 216, 0.15);
+      border-radius: 50% 50% 45% 55% / 55% 45% 55% 45%;
+      backdrop-filter: blur(8px);
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .hero-plate-inner {
+      width: 70%; height: 70%;
+      background: rgba(74, 138, 92, 0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+    }
+    /* SVG bowl illustration */
+    .hero-bowl-svg { width: 200px; opacity: 0.85; }
+
+    /* tags floating around */
+    .hero-tag {
+      position: absolute;
+      background: rgba(247, 243, 236, 0.92);
+      border-radius: 100px;
+      padding: 8px 16px;
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--green-deep);
+      backdrop-filter: blur(8px);
+      white-space: nowrap;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+    }
+    .hero-tag-1 { top: 20%; left: -30px; animation: floatTag 7s ease-in-out infinite; }
+    .hero-tag-2 { bottom: 28%; right: -20px; animation: floatTag 6s ease-in-out 1s infinite; }
+    .hero-tag-3 { top: 65%; left: -15px; animation: floatTag 8s ease-in-out 2s infinite; }
+    @keyframes floatTag {
+      0%, 100% { transform: translateY(0) rotate(-1deg); }
+      50% { transform: translateY(-8px) rotate(1deg); }
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-20px); }
+      to   { opacity: 1; transform: none; }
+    }
+
+    /* scroll indicator */
+    .scroll-hint {
+      position: relative; z-index: 2;
+      display: flex; align-items: center; gap: 14px;
+      padding: 0 48px 40px;
+      color: rgba(212, 232, 216, 0.45);
+      font-size: 0.7rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      animation: fadeDown 1s var(--ease-out) 1.2s both;
+    }
+    .scroll-line {
+      width: 48px; height: 1px;
+      background: linear-gradient(to right, rgba(212,232,216,0.4), transparent);
+    }
+
+    /* ─── MARQUEE STRIP ──────────────────────────────────── */
+    .marquee-strip {
+      background: var(--terra);
+      padding: 14px 0;
+      overflow: hidden;
+    }
+    .marquee-track {
+      display: flex;
+      animation: marquee 22s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-track span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ivory);
+      padding: 0 36px;
+    }
+    .marquee-dot {
+      color: rgba(255,255,255,0.45) !important;
+      padding: 0 4px !important;
+    }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    /* ─── SECTION COMMON ─────────────────────────────────── */
+    section { position: relative; }
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+    }
+    .section-label {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--terra);
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-label::before {
+      content: '';
+      display: block;
+      width: 28px; height: 1px;
+      background: var(--terra);
+    }
+    .section-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2.2rem, 4.5vw, 3.8rem);
+      font-weight: 300;
+      line-height: 1.12;
+      color: var(--green-deep);
+      letter-spacing: -0.01em;
+    }
+    .section-title em { font-style: italic; color: var(--green-light); }
+
+    /* ─── ABOUT ──────────────────────────────────────────── */
+    #about {
+      padding: 110px 0;
+      background: var(--ivory);
+    }
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+    }
+    .about-img-main {
+      width: 100%;
+      aspect-ratio: 4/5;
+      border-radius: 4px 60px 4px 60px;
+      background: var(--green-deep);
+      overflow: hidden;
+      position: relative;
+    }
+    .about-img-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse at 30% 60%, rgba(74, 138, 92, 0.5) 0%, transparent 60%),
+        radial-gradient(ellipse at 80% 20%, rgba(184, 104, 64, 0.25) 0%, transparent 50%),
+        var(--green-deep);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .about-leaves-svg { width: 65%; opacity: 0.6; }
+    .about-img-badge {
+      position: absolute;
+      bottom: -24px; right: -24px;
+      width: 110px; height: 110px;
+      background: var(--terra);
+      border-radius: 50%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      color: var(--ivory);
+      text-align: center;
+    }
+    .about-img-badge .big { font-family: var(--ff-display); font-size: 1.8rem; font-weight: 600; line-height: 1; }
+    .about-img-badge .small { font-size: 0.6rem; letter-spacing: 0.1em; text-transform: uppercase; opacity: 0.85; margin-top: 3px; }
+
+    .about-text { }
+    .about-body {
+      font-size: 1.05rem;
+      font-weight: 300;
+      line-height: 1.8;
+      color: var(--text-body);
+      margin-top: 24px;
+    }
+    .about-body + .about-body { margin-top: 14px; }
+    .about-values {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 40px;
+    }
+    .about-value {
+      background: var(--cream);
+      border: 1px solid var(--cream-warm);
+      border-radius: 12px;
+      padding: 20px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .about-value:hover {
+      border-color: var(--green-pale);
+      transform: translateY(-3px);
+    }
+    .about-value-icon {
+      font-size: 1.5rem;
+      margin-bottom: 8px;
+    }
+    .about-value-title {
+      font-size: 0.82rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--green-deep);
+      margin-bottom: 5px;
+    }
+    .about-value-body {
+      font-size: 0.8rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ─── MENU ───────────────────────────────────────────── */
+    #menu {
+      padding: 110px 0;
+      background: var(--cream);
+    }
+    .menu-header {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      margin-bottom: 56px;
+    }
+    .menu-tabs {
+      display: flex; gap: 6px;
+      background: var(--cream-warm);
+      border-radius: 100px;
+      padding: 5px;
+    }
+    .menu-tab {
+      font-size: 0.78rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      padding: 9px 20px;
+      border-radius: 100px;
+      cursor: pointer;
+      transition: background 0.3s, color 0.3s;
+    }
+    .menu-tab.active {
+      background: var(--green-deep);
+      color: var(--cream);
+    }
+    .menu-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .menu-card {
+      background: var(--ivory);
+      border: 1px solid var(--cream-warm);
+      border-radius: 20px;
+      overflow: hidden;
+      transition: transform 0.4s var(--ease-out), box-shadow 0.4s, border-color 0.3s;
+    }
+    .menu-card:hover {
+      transform: translateY(-8px);
+      box-shadow: 0 24px 64px rgba(28, 58, 42, 0.12);
+      border-color: var(--green-pale);
+    }
+    .menu-card-img {
+      aspect-ratio: 4/3;
+      background: var(--green-mid);
+      position: relative;
+      overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .menu-card-img-inner {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .menu-emoji { font-size: 3.5rem; }
+    .menu-card-tag {
+      position: absolute;
+      top: 14px; right: 14px;
+      background: var(--terra);
+      color: var(--ivory);
+      font-size: 0.65rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      padding: 4px 12px;
+      border-radius: 100px;
+    }
+    .menu-card-body { padding: 22px 24px; }
+    .menu-card-title {
+      font-family: var(--ff-display);
+      font-size: 1.3rem;
+      font-weight: 400;
+      color: var(--green-deep);
+      margin-bottom: 7px;
+    }
+    .menu-card-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+    .menu-card-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 18px;
+      padding-top: 16px;
+      border-top: 1px solid var(--cream-warm);
+    }
+    .menu-card-price {
+      font-family: var(--ff-display);
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--green-deep);
+    }
+    .menu-card-price span { font-size: 0.75rem; font-weight: 300; color: var(--text-muted); }
+    .menu-card-btn {
+      width: 34px; height: 34px;
+      border-radius: 50%;
+      background: var(--green-deep);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--cream);
+      font-size: 1.1rem;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .menu-card-btn:hover { background: var(--terra); transform: rotate(90deg); }
+
+    /* color bg per card */
+    .mc-bg-1 { background: linear-gradient(135deg, #2e5c3e 0%, #1c3a2a 100%); }
+    .mc-bg-2 { background: linear-gradient(135deg, #3d6b4a 0%, #254a32 100%); }
+    .mc-bg-3 { background: linear-gradient(135deg, #b86840 0%, #8a4c2c 100%); }
+    .mc-bg-4 { background: linear-gradient(135deg, #4a8a5c 0%, #2e5c3e 100%); }
+    .mc-bg-5 { background: linear-gradient(135deg, #6a9e7a 0%, #3d6b4a 100%); }
+    .mc-bg-6 { background: linear-gradient(135deg, #c4734a 0%, #9a5530 100%); }
+
+    /* ─── FEATURES / WHY KAHI ────────────────────────────── */
+    #why {
+      padding: 110px 0;
+      background: var(--green-deep);
+      overflow: hidden;
+    }
+    .why-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+      margin-top: 60px;
+    }
+    .why-features {
+      display: flex; flex-direction: column; gap: 28px;
+    }
+    .why-feature {
+      display: flex; gap: 22px; align-items: flex-start;
+      padding: 28px;
+      background: rgba(212, 232, 216, 0.05);
+      border: 1px solid rgba(212, 232, 216, 0.1);
+      border-radius: 16px;
+      transition: background 0.3s, border-color 0.3s, transform 0.3s;
+      cursor: default;
+    }
+    .why-feature:hover {
+      background: rgba(212, 232, 216, 0.1);
+      border-color: rgba(212, 232, 216, 0.2);
+      transform: translateX(8px);
+    }
+    .why-feature-icon {
+      width: 52px; height: 52px; flex-shrink: 0;
+      background: rgba(74, 138, 92, 0.2);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem;
+    }
+    .why-feature-text { flex: 1; }
+    .why-feature-title {
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: var(--cream);
+      margin-bottom: 7px;
+      letter-spacing: 0.02em;
+    }
+    .why-feature-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: rgba(212, 232, 216, 0.6);
+      line-height: 1.7;
+    }
+    .why-visual {
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .why-circle-outer {
+      width: 360px; height: 360px;
+      border: 1px solid rgba(212, 232, 216, 0.1);
+      border-radius: 50%;
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+      animation: rotateSlow 40s linear infinite;
+    }
+    .why-circle-inner {
+      width: 260px; height: 260px;
+      border: 1px solid rgba(212, 232, 216, 0.15);
+      border-radius: 50%;
+      background: rgba(74, 138, 92, 0.1);
+      display: flex; align-items: center; justify-content: center;
+      animation: rotateSlow 40s linear infinite reverse;
+    }
+    @keyframes rotateSlow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    .why-orbit-dot {
+      position: absolute;
+      width: 10px; height: 10px;
+      background: var(--terra-light);
+      border-radius: 50%;
+      top: -5px; left: 50%;
+      transform: translateX(-50%);
+    }
+    .why-orbit-dot2 {
+      top: auto; bottom: -5px;
+      background: var(--green-pale);
+    }
+    .why-circle-text {
+      font-family: var(--ff-display);
+      font-size: 1.1rem;
+      color: var(--cream);
+      text-align: center;
+      line-height: 1.4;
+      animation: rotateSlow 40s linear infinite;
+    }
+    .why-circle-number {
+      font-family: var(--ff-display);
+      font-size: 3.5rem;
+      font-weight: 300;
+      color: var(--green-pale);
+    }
+    .why-section-label .section-label { color: var(--terra-light); }
+    .why-section-label .section-label::before { background: var(--terra-light); }
+    .why-title { color: var(--cream); }
+    .why-title em { color: var(--terra-light); }
+
+    /* ─── PROCESS ────────────────────────────────────────── */
+    #process {
+      padding: 110px 0;
+      background: var(--ivory);
+    }
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 32px;
+      margin-top: 64px;
+    }
+    .process-step {
+      text-align: center;
+      position: relative;
+    }
+    .process-step:not(:last-child)::after {
+      content: '→';
+      position: absolute;
+      top: 32px;
+      right: -16px;
+      color: var(--green-pale);
+      font-size: 1.2rem;
+    }
+    .process-num {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--green-deep);
+      color: var(--cream);
+      font-family: var(--ff-display);
+      font-size: 1.5rem;
+      font-weight: 300;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 20px;
+      position: relative;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .process-step:hover .process-num { background: var(--terra); transform: scale(1.1); }
+    .process-step-icon {
+      font-size: 1.4rem;
+      margin-bottom: 14px;
+    }
+    .process-step-title {
+      font-family: var(--ff-display);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--green-deep);
+      margin-bottom: 9px;
+    }
+    .process-step-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ─── TESTIMONIALS ───────────────────────────────────── */
+    #testimonials {
+      padding: 110px 0;
+      background: var(--cream);
+      overflow: hidden;
+    }
+    .testi-header { margin-bottom: 60px; }
+    .testi-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+    .testi-card {
+      background: var(--ivory);
+      border: 1px solid var(--cream-warm);
+      border-radius: 20px;
+      padding: 32px;
+      position: relative;
+      transition: transform 0.4s var(--ease-out), box-shadow 0.4s;
+    }
+    .testi-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px rgba(28, 58, 42, 0.1);
+    }
+    .testi-card:nth-child(2) {
+      background: var(--green-deep);
+      border-color: var(--green-mid);
+      margin-top: -20px;
+    }
+    .testi-quote {
+      font-family: var(--ff-display);
+      font-size: 3rem;
+      line-height: 0.5;
+      color: var(--green-pale);
+      margin-bottom: 16px;
+    }
+    .testi-card:nth-child(2) .testi-quote { color: rgba(212, 232, 216, 0.3); }
+    .testi-text {
+      font-family: var(--ff-display);
+      font-size: 1.05rem;
+      font-style: italic;
+      font-weight: 300;
+      color: var(--text-body);
+      line-height: 1.7;
+      margin-bottom: 24px;
+    }
+    .testi-card:nth-child(2) .testi-text { color: rgba(212, 232, 216, 0.85); }
+    .testi-author {
+      display: flex; align-items: center; gap: 14px;
+    }
+    .testi-avatar {
+      width: 42px; height: 42px;
+      border-radius: 50%;
+      background: var(--green-pale);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+    .testi-name {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--green-deep);
+    }
+    .testi-card:nth-child(2) .testi-name { color: var(--cream); }
+    .testi-role {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+    .testi-card:nth-child(2) .testi-role { color: rgba(212, 232, 216, 0.5); }
+    .testi-stars { color: var(--terra); font-size: 0.75rem; margin-bottom: 12px; }
+
+    /* ─── CTA BAND ───────────────────────────────────────── */
+    #cta {
+      padding: 90px 0;
+      background: var(--terra);
+      overflow: hidden;
+      position: relative;
+    }
+    #cta::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.08) 0%, transparent 60%);
+    }
+    .cta-inner {
+      position: relative; z-index: 1;
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 40px;
+    }
+    .cta-title {
+      font-family: var(--ff-display);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 300;
+      color: var(--ivory);
+      line-height: 1.15;
+    }
+    .cta-title em { font-style: italic; }
+    .cta-sub {
+      font-size: 0.9rem;
+      font-weight: 300;
+      color: rgba(247, 243, 236, 0.75);
+      margin-top: 12px;
+      max-width: 380px;
+    }
+    .cta-actions { display: flex; gap: 14px; flex-shrink: 0; }
+    .btn-white {
+      background: var(--ivory);
+      color: var(--terra);
+      padding: 14px 30px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.3s, transform 0.2s;
+    }
+    .btn-white:hover { background: var(--cream); transform: translateY(-2px); }
+    .btn-dark {
+      background: rgba(28, 58, 42, 0.25);
+      color: var(--ivory);
+      border: 1px solid rgba(247, 243, 236, 0.3);
+      padding: 14px 30px;
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .btn-dark:hover { background: rgba(28, 58, 42, 0.4); border-color: rgba(247,243,236,0.5); }
+
+    /* ─── CONTACT ────────────────────────────────────────── */
+    #contact {
+      padding: 110px 0;
+      background: var(--ivory);
+    }
+    .contact-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: start;
+      margin-top: 56px;
+    }
+    .contact-info { }
+    .contact-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      padding: 24px;
+      background: var(--cream);
+      border: 1px solid var(--cream-warm);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      transition: border-color 0.3s, transform 0.3s;
+    }
+    .contact-item:hover { border-color: var(--green-pale); transform: translateX(6px); }
+    .contact-item-icon {
+      width: 44px; height: 44px; flex-shrink: 0;
+      background: var(--green-deep);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+    .contact-item-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 5px;
+    }
+    .contact-item-value {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: var(--green-deep);
+    }
+    .contact-hours {
+      background: var(--green-deep);
+      border-radius: 20px;
+      padding: 28px;
+      margin-top: 24px;
+    }
+    .contact-hours-title {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(212, 232, 216, 0.6);
+      margin-bottom: 16px;
+    }
+    .hours-row {
+      display: flex; justify-content: space-between;
+      font-size: 0.88rem;
+      color: var(--cream);
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(212, 232, 216, 0.1);
+    }
+    .hours-row:last-child { border-bottom: none; }
+    .hours-row span:last-child { color: var(--terra-light); }
+
+    /* map placeholder */
+    .map-placeholder {
+      border-radius: 20px;
+      overflow: hidden;
+      aspect-ratio: 1;
+      background: var(--green-deep);
+      position: relative;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .map-bg {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(circle at 40% 40%, rgba(74, 138, 92, 0.3) 0%, transparent 50%),
+        radial-gradient(circle at 70% 70%, rgba(184, 104, 64, 0.2) 0%, transparent 40%),
+        var(--green-deep);
+    }
+    .map-pin {
+      position: relative; z-index: 1;
+      text-align: center;
+    }
+    .map-pin-icon {
+      font-size: 2.5rem;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+      animation: pinBounce 2s ease-in-out infinite;
+    }
+    @keyframes pinBounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .map-pin-label {
+      font-family: var(--ff-display);
+      font-size: 1rem;
+      color: var(--cream);
+      margin-top: 12px;
+    }
+    .map-pin-addr {
+      font-size: 0.78rem;
+      color: rgba(212, 232, 216, 0.6);
+      margin-top: 6px;
+      max-width: 200px;
+      line-height: 1.5;
+    }
+
+    /* ─── FOOTER ─────────────────────────────────────────── */
+    footer {
+      background: var(--charcoal);
+      padding: 72px 0 36px;
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 1.8fr 1fr 1fr 1fr;
+      gap: 48px;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 48px;
+      padding-bottom: 56px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+    .footer-brand { }
+    .footer-logo {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 18px;
+    }
+    .footer-logo-text {
+      font-family: var(--ff-display);
+      font-size: 1.4rem;
+      font-weight: 600;
+      color: var(--cream);
+      letter-spacing: 0.04em;
+    }
+    .footer-desc {
+      font-size: 0.82rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.45);
+      line-height: 1.7;
+      max-width: 240px;
+    }
+    .footer-social {
+      display: flex; gap: 10px;
+      margin-top: 24px;
+    }
+    .footer-social a {
+      width: 36px; height: 36px;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.5);
+      transition: border-color 0.3s, color 0.3s, background 0.3s;
+    }
+    .footer-social a:hover {
+      border-color: var(--terra);
+      color: var(--terra);
+      background: rgba(184, 104, 64, 0.1);
+    }
+    .footer-col-title {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-bottom: 18px;
+    }
+    .footer-col ul { display: flex; flex-direction: column; gap: 11px; }
+    .footer-col li a {
+      font-size: 0.85rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.4);
+      transition: color 0.3s;
+    }
+    .footer-col li a:hover { color: var(--cream); }
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 48px 0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .footer-copy {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+    }
+    .footer-links { display: flex; gap: 24px; }
+    .footer-links a {
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.3);
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: rgba(255,255,255,0.7); }
+
+    /* ─── MOBILE ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 18px 24px; }
+      nav.scrolled { padding: 12px 24px; }
+      .nav-links { display: none; }
+      .hero-content { flex-direction: column; padding: 100px 24px 60px; gap: 40px; }
+      .hero-right { display: none; }
+      .section-inner { padding: 0 24px; }
+      .about-grid, .why-grid, .contact-grid { grid-template-columns: 1fr; gap: 48px; }
+      .menu-grid { grid-template-columns: 1fr 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .testi-grid { grid-template-columns: 1fr; }
+      .testi-card:nth-child(2) { margin-top: 0; }
+      .cta-inner { flex-direction: column; text-align: center; }
+      .cta-sub { max-width: none; }
+      .footer-top { grid-template-columns: 1fr 1fr; gap: 32px; }
+      .footer-bottom { flex-direction: column; gap: 12px; text-align: center; }
+    }
+    @media (max-width: 600px) {
+      .menu-grid { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr; }
+      .process-step::after { display: none; }
+      .about-values { grid-template-columns: 1fr; }
+      .footer-top { grid-template-columns: 1fr; }
+      .hero-stats { flex-direction: column; gap: 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Cursor -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
+  <!-- ── NAV ───────────────────────────────────────────────────── -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">
+      <img src="/logo.jpg" alt="Kahi" style="height: 28px; width: auto; object-fit: contain;" />
+    </a>
+    <ul class="nav-links">
+      <li><a href="#about">Haqqımızda</a></li>
+      <li><a href="#menu">Menyu</a></li>
+      <li><a href="#why">Niyə Kahı?</a></li>
+      <li><a href="#contact">Əlaqə</a></li>
+      <li><a href="tel:+994553432900" class="nav-cta">Sifariş et</a></li>
+    </ul>
+  </nav>
+
+  <!-- ── HERO ──────────────────────────────────────────────────── -->
+  <section id="hero">
+    <div class="hero-bg"></div>
+    <svg class="hero-lines" viewBox="0 0 500 800" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMaxYMid slice">
+      <path d="M400 0 Q350 200 420 400 Q490 600 400 800" stroke="#d4e8d8" stroke-width="1"/>
+      <path d="M450 0 Q380 150 460 350 Q530 550 440 800" stroke="#d4e8d8" stroke-width="0.5"/>
+      <path d="M500 100 Q430 250 480 450 Q530 650 480 800" stroke="#d4e8d8" stroke-width="0.5"/>
+      <circle cx="400" cy="200" r="3" fill="#d4e8d8" opacity="0.6"/>
+      <circle cx="460" cy="420" r="2" fill="#e8c4a0" opacity="0.5"/>
+      <circle cx="430" cy="600" r="3" fill="#d4e8d8" opacity="0.4"/>
+    </svg>
+
+    <div class="hero-content">
+      <div class="hero-left">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Bakı'nın sağlam mətbəxi
+        </div>
+        <h1 class="hero-title">
+          Kahı — Ən ləzzətli və sağlam menyu<br/>
+          <span class="line2">elmi əsaslarla <em>ləzzət.</em></span>
+        </h1>
+        <p class="hero-sub">
+          Hər yemək elmi qidalanma prinsipləri əsasında hazırlanır. Təbii, təzə və dadlı — bədəniniz üçün ən yaxşısı.
+        </p>
+        <div class="hero-actions">
+          <a href="#menu" class="btn-primary">Menyunu gör</a>
+          <a href="#about" class="btn-outline">
+            Daha çox öyrən
+            <span class="btn-outline-arrow">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+                <path d="M2 10L10 2M10 2H4M10 2V8" stroke="currentColor" stroke-width="1.5"/>
+              </svg>
+            </span>
+          </a>
+        </div>
+        <div class="hero-stats">
+          <div>
+            <div class="hero-stat-num">50+</div>
+            <div class="hero-stat-label">Menyu seçimi</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">100%</div>
+            <div class="hero-stat-label">Təbii məhsullar</div>
+          </div>
+          <div>
+            <div class="hero-stat-num">8–22</div>
+            <div class="hero-stat-label">İş saatları</div>
+          </div>
+        </div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-plate">
+          <div class="hero-plate-inner">
+            <img src="/bowl.jpg" alt="Kahi Bowl" class="w-full h-full object-cover rounded-full" />
+              <!-- bowl -->
+              <ellipse cx="100" cy="130" rx="70" ry="20" fill="#1c3a2a" opacity="0.5"/>
+              <path d="M30 100 Q30 160 100 165 Q170 160 170 100 Z" fill="#2e5c3e"/>
+              <ellipse cx="100" cy="100" rx="70" ry="22" fill="#4a8a5c"/>
+              <!-- food items -->
+              <circle cx="80" cy="95" r="12" fill="#b86840" opacity="0.9"/>
+              <circle cx="115" cy="92" r="9" fill="#6aaa7a" opacity="0.85"/>
+              <circle cx="95" cy="108" r="7" fill="#e8c4a0" opacity="0.8"/>
+              <!-- greens -->
+              <ellipse cx="70" cy="88" rx="14" ry="7" fill="#4a8a5c" transform="rotate(-20 70 88)"/>
+              <ellipse cx="130" cy="98" rx="12" ry="6" fill="#3d6b4a" transform="rotate(15 130 98)"/>
+              <!-- seeds -->
+              <circle cx="105" cy="82" r="2" fill="#e8c4a0"/>
+              <circle cx="111" cy="86" r="1.5" fill="#e8c4a0"/>
+              <circle cx="88" cy="80" r="2" fill="#e8c4a0"/>
+              <!-- herbs on top -->
+              <path d="M100 70 Q95 60 90 55 Q95 60 98 50" stroke="#6aaa7a" stroke-width="1.5" fill="none"/>
+              <path d="M100 70 Q105 58 112 52" stroke="#4a8a5c" stroke-width="1.5" fill="none"/>
+              <circle cx="90" cy="55" r="4" fill="#6aaa7a" opacity="0.8"/>
+              <circle cx="112" cy="52" r="3.5" fill="#4a8a5c" opacity="0.8"/>
+            </svg>
+          </div>
+        </div>
+        <div class="hero-tag hero-tag-1">🌿 Vegan dostu</div>
+        <div class="hero-tag hero-tag-2">⚗️ Elmi menyu</div>
+        <div class="hero-tag hero-tag-3">🥤 Smoothies</div>
+      </div>
+    </div>
+    <div class="scroll-hint">
+      <span class="scroll-line"></span>
+      Aşağı diyildin
+    </div>
+  </section>
+
+  <!-- ── MARQUEE ─────────────────────────────────────────────── -->
+  <div class="marquee-strip" aria-hidden="true">
+    <div class="marquee-track">
+      <span>Sağlam Menyu</span><span class="marquee-dot">·</span>
+      <span>Elmi əsaslarla</span><span class="marquee-dot">·</span>
+      <span>Healthy & Tasty</span><span class="marquee-dot">·</span>
+      <span>Təzə məhsullar</span><span class="marquee-dot">·</span>
+      <span>Bakı, Rəşid Behbudov 122F</span><span class="marquee-dot">·</span>
+      <span>055 343 29 00</span><span class="marquee-dot">·</span>
+      <span>Smoothies</span><span class="marquee-dot">·</span>
+      <span>Sağlam Menyu</span><span class="marquee-dot">·</span>
+      <span>Elmi əsaslarla</span><span class="marquee-dot">·</span>
+      <span>Healthy & Tasty</span><span class="marquee-dot">·</span>
+      <span>Təzə məhsullar</span><span class="marquee-dot">·</span>
+      <span>Bakı, Rəşid Behbudov 122F</span><span class="marquee-dot">·</span>
+      <span>055 343 29 00</span><span class="marquee-dot">·</span>
+      <span>Smoothies</span><span class="marquee-dot">·</span>
+    </div>
+  </div>
+
+  <!-- ── ABOUT ──────────────────────────────────────────────────── -->
+  <section id="about">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="about-visual reveal-left">
+          <div class="about-img-main">
+            <div class="about-img-bg">
+              <svg class="about-leaves-svg" viewBox="0 0 300 360" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Large leaf -->
+                <path d="M150 30 C120 80 80 120 70 180 C60 240 90 300 150 320 C210 300 240 240 230 180 C220 120 180 80 150 30Z" fill="#4a8a5c" opacity="0.6"/>
+                <path d="M150 30 L150 320" stroke="#d4e8d8" stroke-width="1.5" opacity="0.4"/>
+                <path d="M150 120 Q130 130 110 125" stroke="#d4e8d8" stroke-width="1" opacity="0.4"/>
+                <path d="M150 150 Q170 160 190 155" stroke="#d4e8d8" stroke-width="1" opacity="0.4"/>
+                <path d="M150 180 Q128 192 105 186" stroke="#d4e8d8" stroke-width="1" opacity="0.4"/>
+                <path d="M150 210 Q173 222 195 215" stroke="#d4e8d8" stroke-width="1" opacity="0.4"/>
+                <!-- Small accent leaf -->
+                <path d="M230 60 C215 85 205 110 210 140 C215 165 230 175 245 165 C260 150 260 120 250 95 C242 72 230 60 230 60Z" fill="#2e5c3e" opacity="0.5"/>
+                <!-- Tiny dots -->
+                <circle cx="100" cy="250" r="4" fill="#e8c4a0" opacity="0.5"/>
+                <circle cx="200" cy="280" r="3" fill="#e8c4a0" opacity="0.4"/>
+                <circle cx="80" cy="160" r="3" fill="#d4e8d8" opacity="0.4"/>
+              </svg>
+            </div>
+            <div class="about-img-badge">
+              <span class="big">5★</span>
+              <span class="small">Müştəri<br/>qiymətləndirməsi</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-text reveal-right">
+          <div class="section-label">Biz kimik?</div>
+          <h2 class="section-title">Qidanız sizin <em>sağlamlığınızdır</em></h2>
+          <p class="about-body">
+            Kahı — elmi qidalanma prinsiplərinə əsaslanan Bakı'nın ən yenilikçi sağlamlıq restoranıdır. Hər yeməyimiz dietoloqlar tərəfindən işlənib hazırlanmış, makronutrient balansı nəzərə alınmaqla təqdim edilir.
+          </p>
+          <p class="about-body">
+            Biz inanırıq ki, sağlam qidalanmaq cansıxıcı olmaq zorunda deyil. Buna görə hər yeməyimiz həm faydalı, həm də əsl ləzzət mənbəyidir.
+          </p>
+          <div class="about-values">
+            <div class="about-value">
+              <div class="about-value-icon">🔬</div>
+              <div class="about-value-title">Elmi yanaşma</div>
+              <div class="about-value-body">Hər resept dietoloq nəzarəti altında hazırlanır</div>
+            </div>
+            <div class="about-value">
+              <div class="about-value-icon">🌱</div>
+              <div class="about-value-title">Təbii məhsullar</div>
+              <div class="about-value-body">Lokal, mövsümi, emal olunmamış inqrediyentlər</div>
+            </div>
+            <div class="about-value">
+              <div class="about-value-icon">⚡</div>
+              <div class="about-value-title">Sürətli hazırlanma</div>
+              <div class="about-value-body">15 dəqiqə ərzində hazır, köklülüyünü qoruyur</div>
+            </div>
+            <div class="about-value">
+              <div class="about-value-icon">📊</div>
+              <div class="about-value-title">Kalori hesablanmış</div>
+              <div class="about-value-body">Hər yeməyin KBJU göstəriciləri açıqdır</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── MENU ───────────────────────────────────────────────────── -->
+  <section id="menu">
+    <div class="section-inner">
+      <div class="menu-header reveal">
+        <div>
+          <div class="section-label">Nə yeyək?</div>
+          <h2 class="section-title">Populyar <em>seçimlər</em></h2>
+        </div>
+        <div class="menu-tabs">
+          <span class="menu-tab active" onclick="setTab(this)">Hamısı</span>
+          <span class="menu-tab" onclick="setTab(this)">Bowls</span>
+          <span class="menu-tab" onclick="setTab(this)">Smoothies</span>
+          <span class="menu-tab" onclick="setTab(this)">Səhər yeməyi</span>
+        </div>
+      </div>
+      <div class="menu-grid">
+        <div class="menu-card reveal" style="transition-delay:0.1s">
+          <div class="menu-card-img mc-bg-1">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🥗</span></div>
+            <span class="menu-card-tag">Populyar</span>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Detox Yaşıl Bowl</div>
+            <div class="menu-card-desc">Quinoa, avokado, göyərti, limon sosu, çia toxumu. Enerjinizi tamamlayır.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">12 AZN <span>/ porsiya</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card reveal" style="transition-delay:0.2s">
+          <div class="menu-card-img mc-bg-3">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🥤</span></div>
+            <span class="menu-card-tag">Yeni</span>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Tropical Smoothie</div>
+            <div class="menu-card-desc">Mango, ananas, zəncəfil, kokos suyu, zerdeçal. İmmunitetin dostudur.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">8 AZN <span>/ 400ml</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card reveal" style="transition-delay:0.3s">
+          <div class="menu-card-img mc-bg-2">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🍳</span></div>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Protein Səhər Yeməyi</div>
+            <div class="menu-card-desc">Yumurta beyazı omlet, tam taxıl çörəyi, pomidor salsa, reyhan.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">10 AZN <span>/ set</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card reveal" style="transition-delay:0.15s">
+          <div class="menu-card-img mc-bg-4">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🫙</span></div>
+            <span class="menu-card-tag">Vegan</span>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Overnight Oats</div>
+            <div class="menu-card-desc">Yulaf, badam südü, meyvə, bal, çia — gecədən hazırlanmış qidalı başlanğıc.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">9 AZN <span>/ 350g</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card reveal" style="transition-delay:0.25s">
+          <div class="menu-card-img mc-bg-5">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🐟</span></div>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Somon Poke Bowl</div>
+            <div class="menu-card-desc">Taze somon, qonur düyü, edamame, avokado, sezam yağı sosu.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">16 AZN <span>/ porsiya</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+        <div class="menu-card reveal" style="transition-delay:0.35s">
+          <div class="menu-card-img mc-bg-6">
+            <div class="menu-card-img-inner"><span class="menu-emoji">🍓</span></div>
+            <span class="menu-card-tag">Bestseller</span>
+          </div>
+          <div class="menu-card-body">
+            <div class="menu-card-title">Berry Açaí Bowl</div>
+            <div class="menu-card-desc">Açaí, çiyələk, yaban mersini, banan, qranola, hindistan cevizi pulları.</div>
+            <div class="menu-card-footer">
+              <div class="menu-card-price">11 AZN <span>/ porsiya</span></div>
+              <div class="menu-card-btn">+</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── WHY KAHI ───────────────────────────────────────────────── -->
+  <section id="why">
+    <div class="section-inner">
+      <div class="why-section-label">
+        <div class="section-label" style="color: rgba(212,232,216,0.55); margin-bottom:20px;">Niyə biz?</div>
+      </div>
+      <div class="why-grid">
+        <div class="why-features">
+          <h2 class="section-title why-title reveal">Kahı seçmək üçün <em>4 səbəb</em></h2>
+          <div class="why-feature reveal" style="transition-delay:0.1s">
+            <div class="why-feature-icon">🔬</div>
+            <div class="why-feature-text">
+              <div class="why-feature-title">Dietoloq tərəfindən təsdiqlənmiş menyu</div>
+              <div class="why-feature-desc">Hər yeməyin makronutrient, vitamin və mineral balansı mütəxəssis tərəfindən yoxlanılıb. Sağlam yemək artıq tapmaca deyil.</div>
+            </div>
+          </div>
+          <div class="why-feature reveal" style="transition-delay:0.2s">
+            <div class="why-feature-icon">🌿</div>
+            <div class="why-feature-text">
+              <div class="why-feature-title">Yalnız təbii inqrediyentlər</div>
+              <div class="why-feature-desc">E-əlavə yoxdur, konservant yoxdur. Yalnız lokal istehsalçılardan alınan mövsümi, təzə məhsullar.</div>
+            </div>
+          </div>
+          <div class="why-feature reveal" style="transition-delay:0.3s">
+            <div class="why-feature-icon">📱</div>
+            <div class="why-feature-text">
+              <div class="why-feature-title">Şəxsi qidalanma planı</div>
+              <div class="why-feature-desc">Hər müştəriyə fərdi yanaşma. Məqsədinizə uyğun — arıqlamaq, əzələ qazanmaq, enerji yüksəltmək.</div>
+            </div>
+          </div>
+          <div class="why-feature reveal" style="transition-delay:0.4s">
+            <div class="why-feature-icon">⚡</div>
+            <div class="why-feature-text">
+              <div class="why-feature-title">Sürətli və rahat</div>
+              <div class="why-feature-desc">Sifariş verin, 15 dəqiqədə hazır. Yerinizə çatdırılır və ya bizdə yeyirsiz — seçim sizin.</div>
+            </div>
+          </div>
+        </div>
+        <div class="why-visual reveal-right">
+          <div class="why-circle-outer">
+            <div class="why-orbit-dot"></div>
+            <div class="why-orbit-dot why-orbit-dot2"></div>
+            <div class="why-circle-inner">
+              <div class="why-circle-text">
+                <div class="why-circle-number">100%</div>
+                Təbii<br/>məhsullar
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PROCESS ────────────────────────────────────────────────── -->
+  <section id="process">
+    <div class="section-inner">
+      <div style="text-align:center" class="reveal">
+        <div class="section-label" style="justify-content:center">Necə işləyirik?</div>
+        <h2 class="section-title">Sifariş <em>prosesi</em></h2>
+      </div>
+      <div class="process-steps">
+        <div class="process-step reveal" style="transition-delay:0.1s">
+          <div class="process-num">01</div>
+          <div class="process-step-icon">📋</div>
+          <div class="process-step-title">Menyu seçin</div>
+          <div class="process-step-desc">Sağlamlıq hədəfinizə uyğun yeməyi menyudan seçin.</div>
+        </div>
+        <div class="process-step reveal" style="transition-delay:0.2s">
+          <div class="process-num">02</div>
+          <div class="process-step-icon">📞</div>
+          <div class="process-step-title">Sifariş edin</div>
+          <div class="process-step-desc">Zəng edin və ya birbaşa restorana gəlin.</div>
+        </div>
+        <div class="process-step reveal" style="transition-delay:0.3s">
+          <div class="process-num">03</div>
+          <div class="process-step-icon">👨‍🍳</div>
+          <div class="process-step-title">Hazırlanır</div>
+          <div class="process-step-desc">Yeməyiniz təzə inqrediyentlərlə hazırlanır.</div>
+        </div>
+        <div class="process-step reveal" style="transition-delay:0.4s">
+          <div class="process-num">04</div>
+          <div class="process-step-icon">🍽️</div>
+          <div class="process-step-title">Zövq alın</div>
+          <div class="process-step-desc">Sağlam, dadlı, enerjili — bədəninizə minnətdarlıq edin.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── TESTIMONIALS ───────────────────────────────────────────── -->
+  <section id="testimonials">
+    <div class="section-inner">
+      <div class="testi-header reveal">
+        <div class="section-label">Rəylər</div>
+        <h2 class="section-title">Müştərilərimiz <em>nə deyir?</em></h2>
+      </div>
+      <div class="testi-grid">
+        <div class="testi-card reveal" style="transition-delay:0.1s">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-quote">"</div>
+          <div class="testi-text">Kahı'da hər yeməyin yanında kalori və protein göstəricisi var — bu mənim həyatımı dəyişdi. İndi nə yediyimi bilirem!</div>
+          <div class="testi-author">
+            <div class="testi-avatar">👩</div>
+            <div>
+              <div class="testi-name">Nigar Əliyeva</div>
+              <div class="testi-role">Fitness məşqçisi, Bakı</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card reveal" style="transition-delay:0.2s">
+          <div class="testi-stars" style="color:#e8c4a0">★★★★★</div>
+          <div class="testi-quote">"</div>
+          <div class="testi-text">Smoothieler sadəcə möhtəşəmdir. Tropical Smoothie sifariş etdim — yeni sevgilim oldu. Hər gün gəlirəm!</div>
+          <div class="testi-author">
+            <div class="testi-avatar" style="background:rgba(212,232,216,0.15)">👨</div>
+            <div>
+              <div class="testi-name">Rauf Hüseynov</div>
+              <div class="testi-role">Mühasib, Bakı</div>
+            </div>
+          </div>
+        </div>
+        <div class="testi-card reveal" style="transition-delay:0.3s">
+          <div class="testi-stars">★★★★★</div>
+          <div class="testi-quote">"</div>
+          <div class="testi-text">İşdə nahar üçün həmişə Kahı. Sağlam yemək bu qədər sürətli hazırlana bilər deyə düşünmürdüm. Xidmət də əla!</div>
+          <div class="testi-author">
+            <div class="testi-avatar">👩‍💼</div>
+            <div>
+              <div class="testi-name">Sevinc Məmmədova</div>
+              <div class="testi-role">Marketinq direktoru</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CTA BAND ───────────────────────────────────────────────── -->
+  <section id="cta">
+    <div class="section-inner">
+      <div class="cta-inner reveal">
+        <div>
+          <h2 class="cta-title">Sağlam həyata <em>bu gün başla</em></h2>
+          <p class="cta-sub">Hər gün saat 08:00–22:00 arasında sizi gözləyirik. Restorana gəlin və ya zəng edin.</p>
+        </div>
+        <div class="cta-actions">
+          <a href="tel:+994553432900" class="btn-white">055 343 29 00</a>
+          <a href="#menu" class="btn-dark">Menyuya bax</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── CONTACT ─────────────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="section-inner">
+      <div class="reveal">
+        <div class="section-label">Bizi tapın</div>
+        <h2 class="section-title">Əlaqə və <em>ünvan</em></h2>
+      </div>
+      <div class="contact-grid">
+        <div class="contact-info reveal-left">
+          <div class="contact-item">
+            <div class="contact-item-icon">📍</div>
+            <div>
+              <div class="contact-item-label">Ünvan</div>
+              <div class="contact-item-value">Rəşid Behbudov 122F, Bakı, Azərbaycan</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📞</div>
+            <div>
+              <div class="contact-item-label">Telefon</div>
+              <div class="contact-item-value">+994 55 343 29 00</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">✉️</div>
+            <div>
+              <div class="contact-item-label">E-poçt</div>
+              <div class="contact-item-value">office@kahi.az</div>
+            </div>
+          </div>
+          <div class="contact-item">
+            <div class="contact-item-icon">📸</div>
+            <div>
+              <div class="contact-item-label">Instagram</div>
+              <div class="contact-item-value">@kahi.az</div>
+            </div>
+          </div>
+          <div class="contact-hours">
+            <div class="contact-hours-title">İş saatları</div>
+            <div class="hours-row"><span>Bazar ertəsi – Cümə</span><span>08:00 – 22:00</span></div>
+            <div class="hours-row"><span>Şənbə</span><span>08:00 – 22:00</span></div>
+            <div class="hours-row"><span>Bazar</span><span>09:00 – 21:00</span></div>
+          </div>
+        </div>
+        <div class="reveal-right">
+          <div class="map-placeholder">
+            <div class="map-bg"></div>
+            <div class="map-pin">
+              <div class="map-pin-icon">📍</div>
+              <div class="map-pin-label">Kahı Restaurant</div>
+              <div class="map-pin-addr">Rəşid Behbudov 122F<br/>Bakı, Azərbaycan</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── FOOTER ─────────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-top">
+      <div class="footer-brand">
+        <div class="footer-logo">
+          <svg width="28" height="28" viewBox="0 0 36 36" fill="none">
+            <circle cx="18" cy="18" r="17" stroke="#4a8a5c" stroke-width="1.2"/>
+            <path d="M18 8 C14 12 10 16 10 21 C10 25.5 13.5 28 18 28 C22.5 28 26 25.5 26 21 C26 16 22 12 18 8Z" fill="#4a8a5c" opacity="0.7"/>
+            <path d="M18 14 C16 17 15 19 15 21.5 C15 23.5 16.3 25 18 25 C19.7 25 21 23.5 21 21.5 C21 19 20 17 18 14Z" fill="#6aaa7a"/>
+          </svg>
+          <span class="footer-logo-text">Kahı</span>
+        </div>
+        <p class="footer-desc">Elmi əsaslarla hazırlanmış sağlam menyu. Bakı'nın ən sağlam restoranı.</p>
+        <div class="footer-social">
+          <a href="https://instagram.com/kahi.az" target="_blank" rel="noopener" aria-label="Instagram">in</a>
+          <a href="https://facebook.com/kahi.az" target="_blank" rel="noopener" aria-label="Facebook">f</a>
+          <a href="tel:+994553432900" aria-label="Phone">☎</a>
+          <a href="mailto:office@kahi.az" aria-label="Email">@</a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Səhifələr</div>
+        <ul>
+          <li><a href="#hero">Ana səhifə</a></li>
+          <li><a href="#about">Haqqımızda</a></li>
+          <li><a href="#menu">Menyu</a></li>
+          <li><a href="#why">Niyə Kahı?</a></li>
+          <li><a href="#contact">Əlaqə</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Menyu</div>
+        <ul>
+          <li><a href="#menu">Bowls</a></li>
+          <li><a href="#menu">Smoothies</a></li>
+          <li><a href="#menu">Səhər yeməyi</a></li>
+          <li><a href="#menu">Protein məhsullar</a></li>
+          <li><a href="#menu">Vegan seçimlər</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <div class="footer-col-title">Əlaqə</div>
+        <ul>
+          <li><a href="tel:+994553432900">055 343 29 00</a></li>
+          <li><a href="mailto:office@kahi.az">office@kahi.az</a></li>
+          <li><a href="#">Rəşid Behbudov 122F</a></li>
+          <li><a href="#">Bakı, Azərbaycan</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-copy">© 2025 Kahı Restaurant. Bütün hüquqlar qorunur.</div>
+      <div class="footer-links">
+        <a href="#">Gizlilik siyasəti</a>
+        <a href="#">Şərtlər</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ── SCRIPTS ────────────────────────────────────────────────── -->
+  <script>
+    // Custom cursor
+    const cursor = document.getElementById('cursor');
+    const ring = document.getElementById('cursorRing');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      ring.style.left = rx + 'px'; ring.style.top = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+    document.querySelectorAll('a, button, .menu-card, .why-feature, .menu-tab').forEach(el => {
+      el.addEventListener('mouseenter', () => { cursor.classList.add('hover'); ring.classList.add('hover'); });
+      el.addEventListener('mouseleave', () => { cursor.classList.remove('hover'); ring.classList.remove('hover'); });
+    });
+
+    // Nav scroll
+    const nav = document.getElementById('nav');
+    window.addEventListener('scroll', () => {
+      nav.classList.toggle('scrolled', window.scrollY > 60);
+    });
+
+    // Intersection Observer reveals
+    const reveals = document.querySelectorAll('.reveal, .reveal-left, .reveal-right');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    reveals.forEach(el => observer.observe(el));
+
+    // Menu tabs (visual only)
+    function setTab(el) {
+      document.querySelectorAll('.menu-tab').forEach(t => t.classList.remove('active'));
+      el.classList.add('active');
+    }
+  </script>
+</body>
+</html>---
+
